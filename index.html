@@ -3,22 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WebLLM AI Chatbot</title>
+    <title>AI Travel Planner</title>
     <script src="https://mlc.ai/web-llm/dist/index.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 40px; }
-        textarea { width: 80%; height: 100px; }
-        button { padding: 10px; font-size: 16px; }
-        #response { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        #map {
+            flex: 2;
+            height: 100vh;
+        }
+        #chat-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            background: #f8f9fa;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 10px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        #response {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            background: white;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
     </style>
 </head>
 <body>
-    <h1>WebLLM AI Chatbot</h1>
-    <textarea id="userInput" placeholder="Type your question..."></textarea><br>
-    <button onclick="askAI()">Ask AI</button>
-    <div id="response">AI Response will appear here...</div>
+    <div id="map"></div>
+    <div id="chat-container">
+        <h1>AI Travel Planner</h1>
+        <textarea id="userInput" placeholder="Ask for travel plans..."></textarea>
+        <button onclick="askAI()">Ask AI</button>
+        <div id="response">AI Response will appear here...</div>
+    </div>
 
     <script>
+        // Initialize Map
+        var map = L.map('map').setView([40.7128, -74.0060], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+        
+        // AI Chatbot
         async function askAI() {
             const inputText = document.getElementById("userInput").value;
             document.getElementById("response").innerText = "Thinking...";
