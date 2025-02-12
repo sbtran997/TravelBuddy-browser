@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebLLM AI Chatbot</title>
+    <script src="https://mlc.ai/web-llm/dist/index.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 40px; }
+        textarea { width: 80%; height: 100px; }
+        button { padding: 10px; font-size: 16px; }
+        #response { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
+    </style>
+</head>
+<body>
+    <h1>WebLLM AI Chatbot</h1>
+    <textarea id="userInput" placeholder="Type your question..."></textarea><br>
+    <button onclick="askAI()">Ask AI</button>
+    <div id="response">AI Response will appear here...</div>
+
+    <script>
+        async function askAI() {
+            const inputText = document.getElementById("userInput").value;
+            document.getElementById("response").innerText = "Thinking...";
+
+            const ai = new WebLLM.ChatModule();
+            await ai.init();
+            const response = await ai.chat(inputText);
+            
+            document.getElementById("response").innerText = response;
+        }
+    </script>
+</body>
+</html>
