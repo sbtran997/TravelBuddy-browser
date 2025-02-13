@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Travel Planner</title>
     <script src="https://mlc.ai/web-llm/dist/index.js"></script>
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -86,39 +85,63 @@
     </div>
 
     <script>
-        // Initialize Map
-        var map = L.map('map').setView([40.7128, -74.0060], 10);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
+        // Initialize Google Maps
+        function initMap() {
+            const map = new google.maps.Map(document.getElementById("map"), {
+                center: { lat: 40.7128, lng: -74.0060 },
+                zoom: 12,
+            });
 
-        // AI Chatbot
+            const service = new google.maps.places.PlacesService(map);
+            service.nearbySearch(
+                {
+                    location: { lat: 40.7128, lng: -74.0060 },
+                    radius: 2000,
+                    type: ["restaurant", "cafe", "bar", "hotel"],
+                },
+                (results, status) => {
+                    if (status === google.maps.places.PlacesServiceStatus.OK) {
+                        results.forEach(place => {
+                            new google.maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name,
+                            });
+                        });
+                    }
+                }
+            );
+        }
+
+        window.onload = initMap;
+
+        // Load WebLLM AI Model
+        let ai;
+        async function loadAI() {
+            ai = new WebLLM.ChatModule();
+            await ai.init();
+            console.log("AI Model Loaded");
+        }
+
+        loadAI(); // Load AI model on startup
+
         async function askAI() {
             const inputText = document.getElementById("userInput").value;
-            console.log("Input received:", inputText); // Log the input for debugging
             document.getElementById("response").innerText = "Thinking...";
 
+            if (!ai) {
+                document.getElementById("response").innerText = "AI is still loading, please wait...";
+                return;
+            }
+
             try {
-                const ai = new WebLLM.ChatModule();
-                await ai.init();
                 const response = await ai.chat(inputText);
-                console.log("AI Response:", response); // Log the response for debugging
                 document.getElementById("response").innerText = response;
             } catch (error) {
-                console.error("Error communicating with the AI:", error);
+                console.error("Error:", error);
                 document.getElementById("response").innerText = "There was an error processing your request.";
             }
         }
-
-        // Simulated AI response (for testing if AI is taking too long)
-        // async function askAI() {
-        //     const inputText = document.getElementById("userInput").value;
-        //     console.log("Input received:", inputText); // Log the input for debugging
-        //     document.getElementById("response").innerText = "Thinking...";
-        //     setTimeout(() => {
-        //         document.getElementById("response").innerText = "This is a sample AI response!";
-        //     }, 1000);
-        // }
     </script>
 </body>
 </html>
