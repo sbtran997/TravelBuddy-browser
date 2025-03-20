@@ -4,9 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Travel Planner</title>
+    
+    <!-- External Libraries -->
     <script src="https://mlc.ai/web-llm/dist/index.js"></script>
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+
+    <!-- CSS Styles -->
+    <link rel="stylesheet" href="interestQuiz.css"> <!-- Quiz Styles -->
+
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -74,10 +80,43 @@
             overflow-y: auto;
             color: #e0e0e0;
         }
+
+        /* Quiz Pop-up */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+            border-radius: 10px;
+            display: none;
+            z-index: 1000;
+        }
+        .popup-content {
+            text-align: center;
+        }
+        .popup label {
+            display: block;
+            margin: 5px 0;
+        }
+        #submit-quiz {
+            margin-top: 10px;
+            padding: 8px 15px;
+            background: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
+    <!-- Map -->
     <div id="map"></div>
+
+    <!-- Chatbot -->
     <div id="chat-container">
         <h1>AI Travel Planner</h1>
         <textarea id="userInput" placeholder="Ask for travel plans..."></textarea>
@@ -85,54 +124,7 @@
         <div id="response">AI Response will appear here...</div>
     </div>
 
-    <script>
-        // Initialize Map
-        var map = L.map('map').setView([40.7128, -74.0060], 10);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        // AI Chatbot
-        async function askAI() {
-            const inputText = document.getElementById("userInput").value;
-            console.log("Input received:", inputText); // Log the input for debugging
-            document.getElementById("response").innerText = "Thinking...";
-
-            try {
-                const ai = new WebLLM.ChatModule();
-                await ai.init();
-                const response = await ai.chat(inputText);
-                console.log("AI Response:", response); // Log the response for debugging
-                document.getElementById("response").innerText = response;
-            } catch (error) {
-                console.error("Error communicating with the AI:", error);
-                document.getElementById("response").innerText = "There was an error processing your request.";
-            }
-        }
-
-        // Simulated AI response (for testing if AI is taking too long)
-        // async function askAI() {
-        //     const inputText = document.getElementById("userInput").value;
-        //     console.log("Input received:", inputText); // Log the input for debugging
-        //     document.getElementById("response").innerText = "Thinking...";
-        //     setTimeout(() => {
-        //         document.getElementById("response").innerText = "This is a sample AI response!";
-        //     }, 1000);
-        // }
-    </script>
-
-    
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interest Quiz</title>
-    <link rel="stylesheet" href="interestQuiz.css">
-</head>
-<body>
-    <h1>Welcome to My GitHub Page</h1>
-
-    <!-- Quiz Pop-up -->
+    <!-- Interest Quiz Pop-up -->
     <div id="quiz-popup" class="popup">
         <div class="popup-content">
             <h2>Find Your Interests!</h2>
@@ -148,8 +140,60 @@
         </div>
     </div>
 
-    <script src="interestQuiz.js"></script>
+    <!-- JavaScript -->
+    <script>
+        // Initialize Map
+        var map = L.map('map').setView([40.7128, -74.0060], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
 
-    
+        // AI Chatbot
+        async function askAI() {
+            const inputText = document.getElementById("userInput").value;
+            console.log("Input received:", inputText); // Debugging
+            document.getElementById("response").innerText = "Thinking...";
+
+            try {
+                const ai = new WebLLM.ChatModule();
+                await ai.init();
+                const response = await ai.chat(inputText);
+                console.log("AI Response:", response); // Debugging
+                document.getElementById("response").innerText = response;
+            } catch (error) {
+                console.error("Error communicating with the AI:", error);
+                document.getElementById("response").innerText = "There was an error processing your request.";
+            }
+        }
+
+        // Quiz Pop-up Logic
+        document.addEventListener("DOMContentLoaded", function () {
+            const quizPopup = document.getElementById("quiz-popup");
+            const submitButton = document.getElementById("submit-quiz");
+
+            // Show the quiz after 3 seconds (if user hasn't already taken it)
+            if (!localStorage.getItem("interests")) {
+                setTimeout(() => {
+                    quizPopup.style.display = "block";
+                }, 3000);
+            }
+
+            submitButton.addEventListener("click", function () {
+                let selectedInterests = [];
+                document.querySelectorAll("input[name='interest']:checked").forEach((checkbox) => {
+                    selectedInterests.push(checkbox.value);
+                });
+
+                if (selectedInterests.length > 0) {
+                    localStorage.setItem("interests", JSON.stringify(selectedInterests)); // Store interests
+                    quizPopup.style.display = "none"; // Hide quiz
+                    alert("Thanks! We'll personalize your experience.");
+                } else {
+                    alert("Please select at least one interest.");
+                }
+            });
+        });
+    </script>
 </body>
 </html>
+
