@@ -10,9 +10,6 @@
     <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-    <!-- CSS Styles -->
-    <link rel="stylesheet" href="interestQuiz.css"> <!-- Quiz Styles -->
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -35,6 +32,7 @@
             background: #1e1e1e;
             box-shadow: -2px 0 5px rgba(0,0,0,0.3);
             border-left: 1px solid #333;
+            position: relative;
         }
         h1 {
             text-align: center;
@@ -81,6 +79,23 @@
             color: #e0e0e0;
         }
 
+        /* Interest Quiz Tab */
+        #quiz-tab {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #007bff;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        #quiz-tab:hover {
+            background: #0056b3;
+        }
+
         /* Quiz Pop-up */
         .popup {
             position: fixed;
@@ -93,15 +108,17 @@
             border-radius: 10px;
             display: none;
             z-index: 1000;
+            width: 300px;
         }
         .popup-content {
             text-align: center;
+            color: black;
         }
         .popup label {
             display: block;
             margin: 5px 0;
         }
-        #submit-quiz {
+        .popup button {
             margin-top: 10px;
             padding: 8px 15px;
             background: blue;
@@ -109,6 +126,21 @@
             border: none;
             cursor: pointer;
             border-radius: 5px;
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: red;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .close-btn:hover {
+            background: darkred;
         }
     </style>
 </head>
@@ -122,10 +154,14 @@
         <textarea id="userInput" placeholder="Ask for travel plans..."></textarea>
         <button onclick="askAI()">Ask AI</button>
         <div id="response">AI Response will appear here...</div>
+
+        <!-- Interest Quiz Tab -->
+        <div id="quiz-tab" onclick="openQuiz()">Take Interest Quiz</div>
     </div>
 
     <!-- Interest Quiz Pop-up -->
     <div id="quiz-popup" class="popup">
+        <button class="close-btn" onclick="closeQuiz()">X</button>
         <div class="popup-content">
             <h2>Find Your Interests!</h2>
             <p>What topics are you most interested in?</p>
@@ -151,14 +187,14 @@
         // AI Chatbot
         async function askAI() {
             const inputText = document.getElementById("userInput").value;
-            console.log("Input received:", inputText); // Debugging
+            console.log("Input received:", inputText);
             document.getElementById("response").innerText = "Thinking...";
 
             try {
                 const ai = new WebLLM.ChatModule();
                 await ai.init();
                 const response = await ai.chat(inputText);
-                console.log("AI Response:", response); // Debugging
+                console.log("AI Response:", response);
                 document.getElementById("response").innerText = response;
             } catch (error) {
                 console.error("Error communicating with the AI:", error);
@@ -167,33 +203,29 @@
         }
 
         // Quiz Pop-up Logic
-        document.addEventListener("DOMContentLoaded", function () {
-            const quizPopup = document.getElementById("quiz-popup");
-            const submitButton = document.getElementById("submit-quiz");
+        function openQuiz() {
+            document.getElementById("quiz-popup").style.display = "block";
+        }
+        function closeQuiz() {
+            document.getElementById("quiz-popup").style.display = "none";
+        }
 
-            // Show the quiz after 3 seconds (if user hasn't already taken it)
-            if (!localStorage.getItem("interests")) {
-                setTimeout(() => {
-                    quizPopup.style.display = "block";
-                }, 3000);
-            }
-
-            submitButton.addEventListener("click", function () {
-                let selectedInterests = [];
-                document.querySelectorAll("input[name='interest']:checked").forEach((checkbox) => {
-                    selectedInterests.push(checkbox.value);
-                });
-
-                if (selectedInterests.length > 0) {
-                    localStorage.setItem("interests", JSON.stringify(selectedInterests)); // Store interests
-                    quizPopup.style.display = "none"; // Hide quiz
-                    alert("Thanks! We'll personalize your experience.");
-                } else {
-                    alert("Please select at least one interest.");
-                }
+        document.getElementById("submit-quiz").addEventListener("click", function () {
+            let selectedInterests = [];
+            document.querySelectorAll("input[name='interest']:checked").forEach((checkbox) => {
+                selectedInterests.push(checkbox.value);
             });
+
+            if (selectedInterests.length > 0) {
+                localStorage.setItem("interests", JSON.stringify(selectedInterests));
+                closeQuiz();
+                alert("Thanks! We'll personalize your experience.");
+            } else {
+                alert("Please select at least one interest.");
+            }
         });
     </script>
 </body>
 </html>
+
 
