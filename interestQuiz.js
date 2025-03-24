@@ -4,15 +4,17 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeQuizBtn = document.querySelector(".close-btn");
     const submitQuizBtn = document.getElementById("submit-quiz");
 
-    // Open the quiz pop-up
-    openQuizBtn.addEventListener("click", function () {
-        quizPopup.classList.add("active");
-    });
+    // Quiz Pop-up Logic
+    function openQuiz() {
+        document.getElementById("quiz-popup").style.display = "block";
+    }
+    function closeQuiz() {
+        document.getElementById("quiz-popup").style.display = "none";
+    }
+    
+    // Attach event listener to close button
+    document.querySelector(".close-btn").addEventListener("click", closeQuiz);
 
-    // Close the quiz pop-up
-    closeQuizBtn.addEventListener("click", function () {
-        quizPopup.classList.remove("active");
-    });
 
     // Submit quiz data
     submitQuizBtn.addEventListener("click", function () {
