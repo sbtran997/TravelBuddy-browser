@@ -4,25 +4,21 @@ document.addEventListener("DOMContentLoaded", function () {
     const closeQuizBtn = document.querySelector(".close-btn");
     const submitQuizBtn = document.getElementById("submit-quiz");
 
-    // Open quiz and display stored data
-    function openQuiz() {
-        quizPopup.style.display = "block";
-        displayStoredData(); // Show previous inputs
+    // Default context if user skips quiz
+    const defaultContext = {
+        interests: ["Travel", "Food", "Adventure"],
+        budget: 500
+    };
+
+    // Load stored data or set default
+    function getStoredData() {
+        let storedData = JSON.parse(localStorage.getItem("quizData"));
+        return storedData ? storedData : defaultContext;
     }
 
-    // Close quiz popup
-    function closeQuiz() {
-        quizPopup.style.display = "none";
-    }
-
-    // Attach event listener to close button
-    closeQuizBtn.addEventListener("click", closeQuiz);
-    openQuizBtn.addEventListener("click", openQuiz);
-
-    // Function to display stored interests and budget
+    // Show stored data in quiz popup
     function displayStoredData() {
-        let storedData = JSON.parse(localStorage.getItem("quizData")) || { interests: [], budget: "Not set" };
-
+        let storedData = getStoredData();
         let interestsText = storedData.interests.length > 0 ? storedData.interests.join(", ") : "No interests selected";
         let budgetText = storedData.budget ? `$${storedData.budget}` : "Not set";
 
@@ -41,6 +37,26 @@ document.addEventListener("DOMContentLoaded", function () {
         resultDiv.innerHTML = `<strong>Your Interests:</strong> ${interestsText} <br> 
                                <strong>Your Budget:</strong> ${budgetText}`;
     }
+
+    // Open quiz popup and notify if data already exists
+    function openQuiz() {
+        quizPopup.style.display = "block";
+        let storedData = JSON.parse(localStorage.getItem("quizData"));
+
+        if (storedData) {
+            alert("You have already provided your preferences. You can review or update them.");
+        }
+        displayStoredData();
+    }
+
+    // Close quiz popup
+    function closeQuiz() {
+        quizPopup.style.display = "none";
+    }
+
+    // Attach event listeners
+    closeQuizBtn.addEventListener("click", closeQuiz);
+    openQuizBtn.addEventListener("click", openQuiz);
 
     // Submit quiz data
     submitQuizBtn.addEventListener("click", function () {
@@ -68,10 +84,17 @@ document.addEventListener("DOMContentLoaded", function () {
 
         localStorage.setItem("quizData", JSON.stringify(quizData));
         alert("Preferences saved successfully!");
-
-        // Refresh the stored data display
         displayStoredData();
     });
+
+    // Set default data if none exists
+    if (!localStorage.getItem("quizData")) {
+        localStorage.setItem("quizData", JSON.stringify(defaultContext));
+    }
+
+    // Display stored data on page load
+    displayStoredData();
 });
+
 
 
