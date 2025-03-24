@@ -159,22 +159,30 @@
         <div id="quiz-tab" onclick="openQuiz()">Take Interest Quiz</div>
     </div>
 
-    <!-- Interest Quiz Pop-up -->
+   <!-- Interest Quiz Pop-up -->
     <div id="quiz-popup" class="popup">
-        <button class="close-btn" onclick="closeQuiz()">X</button>
+        <button class="close-btn">&times;</button>
         <div class="popup-content">
             <h2>Find Your Interests!</h2>
             <p>What topics are you most interested in?</p>
-
+    
             <label><input type="checkbox" name="interest" value="tech"> Tech</label>
             <label><input type="checkbox" name="interest" value="sports"> Sports</label>
             <label><input type="checkbox" name="interest" value="music"> Music</label>
             <label><input type="checkbox" name="interest" value="gaming"> Gaming</label>
             <label><input type="checkbox" name="interest" value="movies"> Movies</label>
-
+    
+            <!-- Budget Input -->
+            <p>Enter your budget ($):</p>
+            <input type="number" id="budgetInput" placeholder="Enter budget" min="0" step="10">
+    
             <button id="submit-quiz">Submit</button>
         </div>
     </div>
+    
+    <!-- Include your styles and scripts -->
+    <link rel="stylesheet" href="interestQuiz.css">
+    <script src="interestQuiz.js"></script>
 
     <!-- JavaScript -->
     <script>
