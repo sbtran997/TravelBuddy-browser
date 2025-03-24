@@ -1,20 +1,46 @@
 document.addEventListener("DOMContentLoaded", function () {
     const quizPopup = document.getElementById("quiz-popup");
-    const openQuizBtn = document.getElementById("open-quiz-btn");
+    const openQuizBtn = document.getElementById("quiz-tab"); // Ensure correct ID
     const closeQuizBtn = document.querySelector(".close-btn");
     const submitQuizBtn = document.getElementById("submit-quiz");
 
-    // Quiz Pop-up Logic
+    // Open quiz and display stored data
     function openQuiz() {
-        document.getElementById("quiz-popup").style.display = "block";
+        quizPopup.style.display = "block";
+        displayStoredData(); // Show previous inputs
     }
-    function closeQuiz() {
-        document.getElementById("quiz-popup").style.display = "none";
-    }
-    
-    // Attach event listener to close button
-    document.querySelector(".close-btn").addEventListener("click", closeQuiz);
 
+    // Close quiz popup
+    function closeQuiz() {
+        quizPopup.style.display = "none";
+    }
+
+    // Attach event listener to close button
+    closeQuizBtn.addEventListener("click", closeQuiz);
+    openQuizBtn.addEventListener("click", openQuiz);
+
+    // Function to display stored interests and budget
+    function displayStoredData() {
+        let storedData = JSON.parse(localStorage.getItem("quizData")) || { interests: [], budget: "Not set" };
+
+        let interestsText = storedData.interests.length > 0 ? storedData.interests.join(", ") : "No interests selected";
+        let budgetText = storedData.budget ? `$${storedData.budget}` : "Not set";
+
+        let resultDiv = document.getElementById("stored-results");
+        if (!resultDiv) {
+            resultDiv = document.createElement("div");
+            resultDiv.id = "stored-results";
+            resultDiv.style.marginTop = "15px";
+            resultDiv.style.padding = "10px";
+            resultDiv.style.background = "#f4f4f4";
+            resultDiv.style.borderRadius = "5px";
+            resultDiv.style.color = "#000";
+            document.querySelector(".popup-content").appendChild(resultDiv);
+        }
+
+        resultDiv.innerHTML = `<strong>Your Interests:</strong> ${interestsText} <br> 
+                               <strong>Your Budget:</strong> ${budgetText}`;
+    }
 
     // Submit quiz data
     submitQuizBtn.addEventListener("click", function () {
@@ -41,8 +67,11 @@ document.addEventListener("DOMContentLoaded", function () {
         };
 
         localStorage.setItem("quizData", JSON.stringify(quizData));
-        quizPopup.classList.remove("active");
         alert("Preferences saved successfully!");
+
+        // Refresh the stored data display
+        displayStoredData();
     });
 });
+
 
